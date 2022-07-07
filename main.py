@@ -3,9 +3,12 @@ import bs4
 from fake_headers import Headers
 
 headers = Headers(os="mac", headers=True).generate()
-KEYWORDS = ['дизайн', 'фото', 'web', 'python']
 URL = "https://habr.com/ru/all/"
-def main():
+
+
+def Scrab():
+    inp = input("Введите несколько слов через пробел для поиска по свежим статьям:")
+    KEYWORD = inp.split()
     response = requests.get(URL, headers=headers)
     data = response.text
     soup = bs4.BeautifulSoup(data, features="html.parser")
@@ -17,11 +20,11 @@ def main():
         link = article.find(class_="tm-article-snippet__title-link").attrs["href"]
         a_name = article.find(class_="tm-article-snippet__title-link").find("span").text
         text = article.find(class_="article-formatted-body article-formatted-body article-formatted-body_version-2")
-        if text == None:
+        if text is None:
             text = article.find(class_="article-formatted-body article-formatted-body article-formatted-body_version-1")
         _text = text.text
         hub = article.find(class_="tm-article-snippet__hubs").text
-        for word in KEYWORDS:
+        for word in KEYWORD:
             r_name = a_name.find(word)
             r_hub = hub.find(word)
             r_text = _text.find(word)
@@ -31,9 +34,16 @@ def main():
                 if news_id in result.keys():
                     pass
                 result[news_id] = result_1
+    if len(result) == 0:
+        print("К сожалению, таких статей нет.")
 
     for value in result.values():
         print(f"{value[0]} - {value[1]} - {value[2]}")
+
+
+def main():
+    print("Добро пожаловть в программу для поиска интересных свежих статей на habr.com .")
+    Scrab()
 
 
 if __name__ == "__main__":
